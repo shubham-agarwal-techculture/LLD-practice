@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Flame, Clock, BookOpen, Wand2, Bot, Sparkles } from 'lucide-react';
+import { Layers, Flame, Clock, BookOpen, Wand2, Bot, Sun, Moon, Settings2, Cpu } from 'lucide-react';
 import { getTimeUntilNextScenario } from '../data/scenarios';
+import { AI_PROVIDERS } from '../data/aiProviders';
 
 export default function Navbar({
   streak = 3,
+  theme = 'dark',
+  onToggleTheme,
   onOpenLibrary,
   onOpenCustom,
   onToggleMentor,
+  onOpenAISettings,
   isMentorOpen,
+  aiConfig,
   totalScenarios = 7
 }) {
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextScenario());
@@ -19,14 +24,17 @@ export default function Navbar({
     return () => clearInterval(timer);
   }, []);
 
+  const activeProvider = AI_PROVIDERS.find(p => p.id === aiConfig?.providerId) || AI_PROVIDERS[0];
+
   return (
     <header style={{
-      background: 'rgba(11, 15, 25, 0.85)',
+      background: 'var(--bg-glass)',
       backdropFilter: 'blur(16px)',
       borderBottom: '1px solid var(--border-subtle)',
       position: 'sticky',
       top: 0,
-      zIndex: 100
+      zIndex: 100,
+      transition: 'background-color 0.25s, border-color 0.25s'
     }}>
       <div style={{
         maxWidth: '1440px',
@@ -55,7 +63,7 @@ export default function Navbar({
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.02em', color: '#fff' }}>
+              <h1 style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
                 LLD<span style={{ color: '#818cf8' }}>Craft</span>
               </h1>
               <span className="badge badge-primary" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
@@ -79,7 +87,7 @@ export default function Navbar({
             borderRadius: '9999px',
             background: 'rgba(245, 158, 11, 0.12)',
             border: '1px solid rgba(245, 158, 11, 0.3)',
-            color: '#fbbf24',
+            color: '#f59e0b',
             fontSize: '0.8rem',
             fontWeight: '700'
           }}>
@@ -94,21 +102,54 @@ export default function Navbar({
             gap: '6px',
             fontSize: '0.78rem',
             color: 'var(--text-secondary)',
-            background: 'rgba(255, 255, 255, 0.03)',
+            background: 'var(--bg-tertiary)',
             padding: '5px 12px',
             borderRadius: '9999px',
             border: '1px solid var(--border-subtle)'
           }}>
-            <Clock size={14} color="#a5b4fc" />
+            <Clock size={14} color="#818cf8" />
             <span>Next Scenario in:</span>
-            <strong style={{ fontFamily: 'var(--font-mono)', color: '#fff' }}>
+            <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
               {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
             </strong>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Theme Toggle Button (Dark / Light) */}
+          <button
+            onClick={onToggleTheme}
+            className="btn btn-secondary btn-sm"
+            id="nav-btn-theme"
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            style={{ padding: '6px 10px', fontSize: '0.78rem' }}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun size={15} color="#f59e0b" />
+                <span style={{ fontSize: '0.75rem' }}>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon size={15} color="#818cf8" />
+                <span style={{ fontSize: '0.75rem' }}>Dark</span>
+              </>
+            )}
+          </button>
+
+          {/* AI Settings Button */}
+          <button
+            onClick={onOpenAISettings}
+            className="btn btn-secondary btn-sm"
+            id="nav-btn-ai-settings"
+            title="Configure AI Providers (Ollama, Gemini, OpenAI, etc.)"
+            style={{ padding: '6px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+          >
+            <Cpu size={14} color="#10b981" />
+            <span>{activeProvider.id === 'ollama' ? '🦙 Ollama' : activeProvider.name.split(' ')[0]}</span>
+          </button>
+
           <button
             onClick={onOpenLibrary}
             className="btn btn-secondary btn-sm"
@@ -122,7 +163,7 @@ export default function Navbar({
             className="btn btn-secondary btn-sm"
             id="nav-btn-custom"
           >
-            <Wand2 size={14} /> Custom Prompt
+            <Wand2 size={14} /> Custom
           </button>
 
           <button

@@ -10,7 +10,9 @@ import AIMentorDrawer from './components/AIMentorDrawer';
 import PracticeWorkspace from './components/PracticeWorkspace';
 import ScenarioLibraryModal from './components/ScenarioLibraryModal';
 import CustomScenarioModal from './components/CustomScenarioModal';
+import AISettingsModal from './components/AISettingsModal';
 import { getScenarioOfTheDay, LLD_SCENARIOS } from './data/scenarios';
+import { DEFAULT_AI_CONFIG } from './data/aiProviders';
 
 export default function App() {
   const [scenario, setScenario] = useState(() => getScenarioOfTheDay());
@@ -18,6 +20,35 @@ export default function App() {
   const [isMentorOpen, setIsMentorOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isCustomOpen, setIsCustomOpen] = useState(false);
+  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
+
+  // Theme State: 'dark' | 'light'
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('lld_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('lld_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  // AI Multi-Provider Config
+  const [aiConfig, setAiConfig] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lld_ai_config');
+      return saved ? JSON.parse(saved) : DEFAULT_AI_CONFIG;
+    } catch {
+      return DEFAULT_AI_CONFIG;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('lld_ai_config', JSON.stringify(aiConfig));
+  }, [aiConfig]);
 
   // Solved tracking
   const [solvedMap, setSolvedMap] = useState(() => {
@@ -108,14 +139,18 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Top Navbar */}
+      {/* Top Navbar with Theme Switcher & AI Provider Status */}
       <Navbar
         streak={streak}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         totalScenarios={LLD_SCENARIOS.length}
         onOpenLibrary={() => setIsLibraryOpen(true)}
         onOpenCustom={() => setIsCustomOpen(true)}
         onToggleMentor={() => setIsMentorOpen(!isMentorOpen)}
+        onOpenAISettings={() => setIsAISettingsOpen(true)}
         isMentorOpen={isMentorOpen}
+        aiConfig={aiConfig}
       />
 
       {/* Main Content Area */}
@@ -138,12 +173,22 @@ export default function App() {
         />
       </main>
 
-      {/* Slide-out AI Mentor Drawer */}
+      {/* Slide-out AI Mentor Drawer with Multi-Provider Support */}
       <AIMentorDrawer
         isOpen={isMentorOpen}
         onClose={() => setIsMentorOpen(false)}
         currentScenario={scenario}
         currentStageIndex={currentStage}
+        aiConfig={aiConfig}
+        onOpenSettings={() => setIsAISettingsOpen(true)}
+      />
+
+      {/* AI Multi-Provider Configuration Modal (Ollama, Gemini, OpenAI, etc.) */}
+      <AISettingsModal
+        isOpen={isAISettingsOpen}
+        onClose={() => setIsAISettingsOpen(false)}
+        currentConfig={aiConfig}
+        onSaveConfig={setAiConfig}
       />
 
       {/* Scenario Library Modal */}
@@ -166,7 +211,7 @@ export default function App() {
       <footer style={{
         marginTop: 'auto',
         borderTop: '1px solid var(--border-subtle)',
-        background: 'rgba(9, 13, 22, 0.95)',
+        background: 'var(--bg-glass)',
         padding: '24px',
         textAlign: 'center',
         fontSize: '0.8rem',
@@ -177,7 +222,7 @@ export default function App() {
             <strong>LLD Craft</strong> — Daily Low-Level Design Practice & Socratic Mentoring Platform.
           </div>
           <div>
-            Master SOLID Principles, Design Patterns, Concurrency Locks, and System Architecture through deliberate daily practice.
+            Supports <strong>Ollama (Local)</strong>, Google Gemini, OpenAI, Groq, DeepSeek, and offline Socratic tutoring in Dark & Light modes.
           </div>
         </div>
       </footer>

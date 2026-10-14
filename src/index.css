@@ -1,22 +1,23 @@
 /* ==========================================================================
-   LLD Craft — Premier Modern Dark Glassmorphic Design System
+   LLD Craft — Premier Modern Glassmorphic Design System (Dark & Light Theme)
    ========================================================================== */
 
-:root {
+:root, [data-theme="dark"] {
   --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Fira Code', 'JetBrains Mono', monospace;
 
-  /* Color Palette */
+  /* Dark Theme Palette */
   --bg-primary: #090d16;
   --bg-secondary: #0f172a;
   --bg-tertiary: #1e293b;
-  --bg-card: rgba(17, 24, 39, 0.75);
-  --bg-card-hover: rgba(30, 41, 59, 0.85);
+  --bg-card: rgba(17, 24, 39, 0.78);
+  --bg-card-hover: rgba(30, 41, 59, 0.88);
   --bg-glass: rgba(15, 23, 42, 0.65);
+  --code-bg: #090d16;
 
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-medium: rgba(255, 255, 255, 0.16);
   --border-glow: rgba(99, 102, 241, 0.35);
 
   --accent-indigo: #6366f1;
@@ -42,6 +43,37 @@
 
   --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+  --ambient-gradient-1: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent 70%);
+  --ambient-gradient-2: radial-gradient(circle at 100% 40%, rgba(16, 185, 129, 0.08), transparent 40%);
+  --ambient-gradient-3: radial-gradient(circle at 0% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
+}
+
+/* Light Mode Overrides */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: rgba(241, 245, 249, 0.98);
+  --bg-glass: rgba(255, 255, 255, 0.88);
+  --code-bg: #0f172a;
+
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-medium: rgba(15, 23, 42, 0.16);
+  --border-glow: rgba(99, 102, 241, 0.25);
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  --shadow-subtle: 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.15);
+  --shadow-card: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+
+  --ambient-gradient-1: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.1), transparent 70%);
+  --ambient-gradient-2: radial-gradient(circle at 100% 40%, rgba(16, 185, 129, 0.05), transparent 40%);
+  --ambient-gradient-3: radial-gradient(circle at 0% 70%, rgba(139, 92, 246, 0.05), transparent 40%);
 }
 
 * {
@@ -60,10 +92,11 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent 70%),
-    radial-gradient(circle at 100% 40%, rgba(16, 185, 129, 0.08), transparent 40%),
-    radial-gradient(circle at 0% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
+    var(--ambient-gradient-1),
+    var(--ambient-gradient-2),
+    var(--ambient-gradient-3);
   background-attachment: fixed;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Custom Scrollbar */
@@ -72,7 +105,7 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--bg-secondary);
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(99, 102, 241, 0.35);
@@ -87,7 +120,7 @@ h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 /* Glassmorphism Panels */
@@ -98,19 +131,6 @@ h1, h2, h3, h4, h5 {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-}
-
-/* Gradient Text */
-.gradient-text-indigo {
-  background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #c084fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gradient-text-emerald {
-  background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 /* Badges */
@@ -129,31 +149,31 @@ h1, h2, h3, h4, h5 {
 
 .badge-easy {
   background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  color: #10b981;
   border-color: rgba(16, 185, 129, 0.3);
 }
 
 .badge-medium {
   background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+  color: #f59e0b;
   border-color: rgba(245, 158, 11, 0.3);
 }
 
 .badge-hard {
   background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
+  color: #f43f5e;
   border-color: rgba(244, 63, 94, 0.3);
 }
 
 .badge-primary {
   background: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
+  color: var(--accent-indigo);
   border-color: rgba(99, 102, 241, 0.3);
 }
 
 .badge-company {
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
   border-color: var(--border-subtle);
   font-size: 0.72rem;
   text-transform: none;
@@ -189,13 +209,13 @@ h1, h2, h3, h4, h5 {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-tertiary);
   color: var(--text-primary);
   border-color: var(--border-medium);
 }
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--bg-card-hover);
+  border-color: rgba(99, 102, 241, 0.4);
   transform: translateY(-1px);
 }
 
@@ -236,6 +256,29 @@ h1, h2, h3, h4, h5 {
   animation: pulseGlow 2s infinite ease-in-out;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Form Controls */
+input, select, textarea {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-indigo);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
 /* Code Display */
 pre code {
   font-family: var(--font-mono);
@@ -256,15 +299,7 @@ pre code {
   width: 100%;
   margin: 0 auto;
   padding: 24px;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-}
-
-@media (min-width: 1200px) {
-  .main-content-split {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 24px;
-  }
 }
