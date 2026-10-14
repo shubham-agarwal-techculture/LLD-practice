@@ -1,151 +1,159 @@
-import React from 'react';
-import { Calendar, Briefcase, Clock, Tag, ChevronRight, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Briefcase, Clock, Check, Terminal, ChevronDown, ChevronUp, Columns, BookOpen, PenTool } from 'lucide-react';
 
 export default function DailyBanner({
   scenario,
   currentStage,
   onSelectStage,
-  isSolved = false
+  isSolved = false,
+  viewMode = 'split',
+  onSelectViewMode
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const todayDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
+    month: 'short', day: 'numeric', year: 'numeric'
   });
 
   const stages = [
-    { id: 0, label: '1. Clarify Scope' },
-    { id: 1, label: '2. Domain Entities' },
-    { id: 2, label: '3. Class UML' },
-    { id: 3, label: '4. Design Patterns' },
-    { id: 4, label: '5. Code & Sim' }
+    { id: 0, code: '01', label: 'SCOPE' },
+    { id: 1, code: '02', label: 'ENTITIES' },
+    { id: 2, code: '03', label: 'CLASS UML' },
+    { id: 3, code: '04', label: 'PATTERNS' },
+    { id: 4, code: '05', label: 'CODE & SIM' },
   ];
 
-  return (
-    <div style={{
-      background: 'var(--bg-card)',
-      backdropFilter: 'blur(16px)',
-      border: '1px solid var(--border-subtle)',
-      borderRadius: 'var(--radius-xl)',
-      padding: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '18px',
-      boxShadow: 'var(--shadow-card)',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {/* Decorative gradient orb */}
-      <div style={{
-        position: 'absolute',
-        top: '-40px',
-        right: '-40px',
-        width: '180px',
-        height: '180px',
-        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%)',
-        borderRadius: '50%',
-        pointerEvents: 'none'
-      }} />
+  const specCode = scenario.isCustom ? 'ON-DEMAND' : `SPEC-D0${scenario.dayIndex || 1}`;
+  const diffClass = scenario.difficulty === 'Easy' ? 'badge-easy'
+    : scenario.difficulty === 'Medium' ? 'badge-medium' : 'badge-hard';
 
-      {/* Top Meta Line: Today's Date & Company Tag */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#a5b4fc', fontWeight: '600' }}>
-            <Calendar size={14} />
-            <span>TODAY'S SCENARIO • {todayDate}</span>
+  return (
+    <div className="banner">
+      <div className="banner-body">
+        {/* Top meta & layout controls row */}
+        <div className="banner-meta">
+          <div className="banner-meta-left">
+            <span className="mono-tag" style={{ color: 'var(--deco-indigo)', borderColor: 'var(--border-indigo)' }}>
+              <Terminal size={11} />
+              {specCode}
+            </span>
+
+            <span className={`badge ${diffClass}`}>
+              {scenario.difficulty}
+            </span>
+
+            <span className="badge badge-company">
+              <Briefcase size={10} />
+              {scenario.company}
+            </span>
+
+            {scenario.isCustom ? (
+              <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)' }}>
+                ✦ ON-DEMAND
+              </span>
+            ) : (
+              <span className="mono-tag">
+                <Calendar size={10} />
+                {todayDate}
+              </span>
+            )}
+
+            {isSolved && (
+              <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)', fontWeight: 700 }}>
+                <Check size={10} />
+                SOLVED
+              </span>
+            )}
+
+            <span className="mono-tag">
+              <Clock size={10} />
+              {scenario.estimatedTime || '45m'}
+            </span>
           </div>
 
-          <span className={`badge ${scenario.difficulty === 'Easy' ? 'badge-easy' : scenario.difficulty === 'Medium' ? 'badge-medium' : 'badge-hard'}`}>
-            {scenario.difficulty}
-          </span>
+          {/* Layout Mode Switcher */}
+          {onSelectViewMode && (
+            <div className="view-mode-toggle">
+              <button
+                type="button"
+                onClick={() => onSelectViewMode('split')}
+                className={`view-mode-btn${viewMode === 'split' ? ' active' : ''}`}
+                title="Side-by-side Guided Journey and Solution Workbench"
+              >
+                <Columns size={12} />
+                <span>Split Studio</span>
+              </button>
 
-          <span className="badge badge-company">
-            <Briefcase size={12} /> {scenario.company}
-          </span>
+              <button
+                type="button"
+                onClick={() => onSelectViewMode('guide')}
+                className={`view-mode-btn${viewMode === 'guide' ? ' active' : ''}`}
+                title="Full-width view of architectural specs & diagrams"
+              >
+                <BookOpen size={12} />
+                <span>Guide Focus</span>
+              </button>
 
-          {isSolved && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#34d399', fontWeight: '700' }}>
-              <CheckCircle2 size={15} /> SOLVED TODAY
-            </span>
+              <button
+                type="button"
+                onClick={() => onSelectViewMode('workbench')}
+                className={`view-mode-btn${viewMode === 'workbench' ? ' active' : ''}`}
+                title="Full-width solution drafting and rubric scoring"
+              >
+                <PenTool size={12} />
+                <span>Workbench</span>
+              </button>
+            </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          <Clock size={13} />
-          <span>Estimated: {scenario.estimatedTime || '45 mins'}</span>
+        {/* Title & Context Brief */}
+        <div className="flex-col gap-2">
+          <div className="flex justify-between items-start gap-4 flex-wrap">
+            <h2 className="banner-title" style={{ fontSize: '1.25rem' }}>{scenario.title}</h2>
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.72rem', padding: '4px 8px', borderRadius: 6 }}
+            >
+              {isExpanded ? <><ChevronUp size={12} /> Less</> : <><ChevronDown size={12} /> Details</>}
+            </button>
+          </div>
+
+          <p className="banner-summary" style={{ fontSize: '0.85rem', lineHeight: 1.5 }}>
+            {scenario.summary}
+          </p>
+
+          {isExpanded && scenario.realWorldContext && (
+            <div className="card-raised" style={{ marginTop: '4px', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Industry Context: </strong>
+              {scenario.realWorldContext}
+            </div>
+          )}
+        </div>
+
+        {/* Tags */}
+        <div className="banner-tags" style={{ marginTop: '2px' }}>
+          {scenario.tags?.map((t, i) => (
+            <span key={i} className="mono-tag" style={{ fontSize: '0.7rem' }}>#{t}</span>
+          ))}
         </div>
       </div>
 
-      {/* Title & Summary */}
-      <div>
-        <h2 style={{ fontSize: '1.6rem', color: '#fff', marginBottom: '8px', lineHeight: '1.3' }}>
-          {scenario.title}
-        </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '980px', lineHeight: '1.55' }}>
-          {scenario.summary}
-        </p>
-      </div>
-
-      {/* Tags */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {scenario.tags?.map((t, idx) => (
-          <span
-            key={idx}
-            style={{
-              padding: '4px 10px',
-              borderRadius: '6px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border-subtle)',
-              fontSize: '0.72rem',
-              color: '#cbd5e1'
-            }}
-          >
-            #{t}
-          </span>
-        ))}
-      </div>
-
-      {/* 5-Step Milestone Navigation Tabs */}
-      <div style={{
-        marginTop: '6px',
-        paddingTop: '16px',
-        borderTop: '1px solid var(--border-subtle)',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-        gap: '8px'
-      }}>
-        {stages.map((st) => {
+      {/* Stage Stepper Tab Bar */}
+      <div className="stage-bar">
+        {stages.map(st => {
           const isActive = currentStage === st.id;
           const isPassed = currentStage > st.id;
-
           return (
             <button
               key={st.id}
               onClick={() => onSelectStage(st.id)}
               id={`stage-tab-${st.id}`}
-              style={{
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: isActive ? '1px solid var(--accent-indigo)' : '1px solid var(--border-subtle)',
-                background: isActive
-                  ? 'rgba(99, 102, 241, 0.22)'
-                  : isPassed
-                  ? 'rgba(16, 185, 129, 0.08)'
-                  : 'rgba(255, 255, 255, 0.02)',
-                color: isActive ? '#fff' : isPassed ? '#6ee7b7' : 'var(--text-secondary)',
-                fontWeight: isActive ? '700' : '500',
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                textAlign: 'center',
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px'
-              }}
+              className={`stage-tab${isActive ? ' active' : isPassed ? ' passed' : ''}`}
             >
-              {isPassed && <CheckCircle2 size={13} color="#10b981" />}
+              {isPassed ? <Check size={11} /> : <span style={{ opacity: 0.5 }}>{st.code}</span>}
               <span>{st.label}</span>
             </button>
           );

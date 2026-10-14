@@ -35,72 +35,28 @@ export default function AISettingsModal({ isOpen, onClose, currentConfig, onSave
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.75)',
-      backdropFilter: 'blur(8px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      zIndex: 1200
-    }}>
-      <div style={{
-        width: '560px',
-        maxWidth: '100%',
-        maxHeight: '90vh',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-medium)',
-        borderRadius: 'var(--radius-xl)',
-        boxShadow: 'var(--shadow-card)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
-        <div style={{
-          padding: '20px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              background: 'rgba(99, 102, 241, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Cpu size={18} color="#818cf8" />
+        <div className="modal-header">
+          <div className="flex items-center gap-3">
+            <div className="brand-icon" style={{ width: 32, height: 32, borderRadius: 8 }}>
+              <Cpu size={16} color="#fff" />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>AI Provider Configuration</h3>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Configure local Ollama, Google Gemini, OpenAI, Groq, or offline mode.
+              <h2>AI Provider Configuration</h2>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                Local Ollama, Gemini, OpenAI, Groq, or offline mode.
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="btn btn-secondary btn-sm" style={{ padding: '6px' }}>
-            <X size={16} />
+          <button onClick={onClose} className="btn btn-ghost btn-icon btn-sm">
+            <X size={15} />
           </button>
         </div>
 
         {/* Body Form */}
-        <form onSubmit={handleSave} style={{
-          padding: '20px 24px',
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px'
-        }}>
+        <form onSubmit={handleSave} className="modal-body" style={{ overflowY: 'auto' }}>
           {/* Provider Selection Cards */}
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
@@ -115,14 +71,14 @@ export default function AISettingsModal({ isOpen, onClose, currentConfig, onSave
                     onClick={() => handleProviderChange(p.id)}
                     style={{
                       padding: '10px',
-                      borderRadius: 'var(--radius-md)',
+                      borderRadius: 8,
                       border: isSelected ? '2px solid var(--accent-indigo)' : '1px solid var(--border-subtle)',
-                      background: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'var(--bg-card)',
+                      background: isSelected ? 'var(--surface-indigo)' : 'var(--bg-raised)',
                       cursor: 'pointer',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '4px',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.18s'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -141,28 +97,13 @@ export default function AISettingsModal({ isOpen, onClose, currentConfig, onSave
           </div>
 
           {/* Provider Description Banner */}
-          <div style={{
-            padding: '10px 14px',
-            borderRadius: 'var(--radius-sm)',
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-subtle)',
-            fontSize: '0.78rem',
-            color: 'var(--text-secondary)'
-          }}>
+          <div className="card-raised" style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
             {selectedProvider.description}
           </div>
 
           {/* OLLAMA LOCAL CONFIG */}
           {selectedProvider.id === 'ollama' && (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              padding: '16px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              background: 'rgba(16, 185, 129, 0.05)'
-            }}>
+            <div className="card-emerald flex-col gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontWeight: '700', fontSize: '0.84rem' }}>
                 <Server size={16} /> Local Ollama Settings (100% Free & Private)
               </div>
@@ -202,14 +143,14 @@ export default function AISettingsModal({ isOpen, onClose, currentConfig, onSave
               {testStatus && (
                 <div style={{
                   padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: 7,
                   fontSize: '0.76rem',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  background: testStatus.success ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
-                  color: testStatus.success ? '#10b981' : '#f43f5e',
-                  border: `1px solid ${testStatus.success ? '#10b981' : '#f43f5e'}`
+                  gap: 6,
+                  background: testStatus.success ? 'var(--surface-emerald)' : 'var(--surface-rose)',
+                  color: testStatus.success ? 'var(--accent-emerald)' : 'var(--accent-rose)',
+                  border: `1px solid ${testStatus.success ? 'var(--border-emerald)' : 'var(--border-rose)'}`
                 }}>
                   {testStatus.success ? <Check size={14} /> : <AlertCircle size={14} />}
                   <span>{testStatus.message}</span>
@@ -268,15 +209,7 @@ export default function AISettingsModal({ isOpen, onClose, currentConfig, onSave
 
           {/* CLOUD API KEYS (Gemini, OpenAI, Groq, DeepSeek, OpenRouter) */}
           {selectedProvider.requiresApiKey && (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              padding: '16px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-medium)',
-              background: 'var(--bg-tertiary)'
-            }}>
+            <div className="card flex-col gap-3">
               <div>
                 <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
                   {selectedProvider.name} API Key
@@ -366,12 +299,12 @@ export default function AISettingsModal({ isOpen, onClose, currentConfig, onSave
           )}
 
           {/* Footer action buttons */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+          <div className="flex justify-end gap-2" style={{ marginTop: 8 }}>
             <button type="button" onClick={onClose} className="btn btn-secondary">
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" id="btn-save-ai-settings">
-              <Sparkles size={15} /> Save & Apply Provider
+              <Sparkles size={15} /> Save Provider
             </button>
           </div>
         </form>

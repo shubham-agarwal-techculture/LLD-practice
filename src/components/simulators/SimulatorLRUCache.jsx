@@ -61,17 +61,17 @@ export default function SimulatorLRUCache() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
-        border: '1px solid var(--border-glow)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '20px',
-        boxShadow: 'var(--shadow-glow)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="pulse-indicator"></span>
-              <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>O(1) LRU Cache: Doubly Linked List + HashMap Visualizer</h3>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>O(1) LRU Cache: Doubly Linked List + HashMap Visualizer</h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
               Capacity: <strong>{CAPACITY} entries</strong>. Observe how hits promote to HEAD and full capacity evicts TAIL in O(1).
@@ -83,7 +83,7 @@ export default function SimulatorLRUCache() {
       <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px' }}>
         {/* Put / Get Form */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '18px',
@@ -91,7 +91,7 @@ export default function SimulatorLRUCache() {
           flexDirection: 'column',
           gap: '14px'
         }}>
-          <h4 style={{ fontSize: '0.9rem', color: '#a5b4fc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h4 style={{ fontSize: '0.9rem', color: 'var(--accent-indigo)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Database size={16} /> Cache Operations
           </h4>
 
@@ -109,8 +109,8 @@ export default function SimulatorLRUCache() {
                   padding: '8px 10px',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-medium)',
-                  background: 'rgba(10, 15, 26, 0.8)',
-                  color: '#fff',
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.85rem'
                 }}
@@ -130,8 +130,8 @@ export default function SimulatorLRUCache() {
                   padding: '8px 10px',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-medium)',
-                  background: 'rgba(10, 15, 26, 0.8)',
-                  color: '#fff',
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.85rem'
                 }}
@@ -164,7 +164,7 @@ export default function SimulatorLRUCache() {
 
         {/* Doubly Linked List Visual Nodes */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '20px',
@@ -173,7 +173,7 @@ export default function SimulatorLRUCache() {
           gap: '16px'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4 style={{ fontSize: '0.9rem', color: '#cbd5e1' }}>Doubly Linked List Structure</h4>
+            <h4 style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Doubly Linked List Structure</h4>
             <div style={{
               fontSize: '0.78rem',
               color: '#a5b4fc',

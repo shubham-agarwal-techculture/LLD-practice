@@ -5,10 +5,12 @@ import SimulatorSplitwise from './simulators/SimulatorSplitwise';
 import SimulatorElevator from './simulators/SimulatorElevator';
 import SimulatorRateLimiter from './simulators/SimulatorRateLimiter';
 import SimulatorLRUCache from './simulators/SimulatorLRUCache';
+import SimulatorVendingMachine from './simulators/SimulatorVendingMachine';
+import SimulatorBookMyShow from './simulators/SimulatorBookMyShow';
 
 export default function MilestoneCodeSim({ scenario, onProceedPrev }) {
-  const [activeTab, setActiveTab] = useState('simulator'); // 'simulator' | 'code'
-  const [lang, setLang] = useState('java'); // 'java' | 'python'
+  const [activeTab, setActiveTab] = useState('simulator');
+  const [lang, setLang] = useState('java');
   const [copied, setCopied] = useState(false);
 
   const codeMap = scenario.referenceCode || {};
@@ -21,199 +23,125 @@ export default function MilestoneCodeSim({ scenario, onProceedPrev }) {
   };
 
   const renderSimulator = () => {
-    const simType = scenario.simulatorType || 'parking-lot';
-    switch (simType) {
-      case 'splitwise':
-        return <SimulatorSplitwise />;
-      case 'elevator':
-        return <SimulatorElevator />;
-      case 'rate-limiter':
-        return <SimulatorRateLimiter />;
-      case 'lru-cache':
-        return <SimulatorLRUCache />;
-      case 'parking-lot':
-      default:
-        return <SimulatorParkingLot />;
+    switch (scenario.simulatorType) {
+      case 'splitwise':        return <SimulatorSplitwise />;
+      case 'elevator':         return <SimulatorElevator />;
+      case 'rate-limiter':     return <SimulatorRateLimiter />;
+      case 'lru-cache':        return <SimulatorLRUCache />;
+      case 'vending-machine':  return <SimulatorVendingMachine />;
+      case 'bookmyshow':       return <SimulatorBookMyShow />;
+      default:                 return <SimulatorParkingLot />;
     }
   };
 
+  const solidPrinciples = [
+    { letter: 'S', label: 'Single Responsibility', desc: 'Controllers orchestrate, models store invariants, strategies compute policies.' },
+    { letter: 'O', label: 'Open/Closed', desc: 'New vehicle types or pricing rules plug in without changing core classes.' },
+    { letter: 'L', label: 'Liskov Substitution', desc: 'Subclasses satisfy contracts cleanly without violating invariants.' },
+    { letter: 'I·D', label: 'Interface Segregation & DIP', desc: 'Narrow interfaces injected via constructors, not hard concrete instantiations.' },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="flex-col gap-6">
+
       {/* Stage Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)',
-        border: '1px solid var(--border-glow)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
+      <div className="card flex justify-between items-center flex-wrap gap-4"
+        style={{ background: 'var(--surface-indigo)', border: '1px solid var(--border-indigo)' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <Sparkles size={18} color="#6366f1" />
-            <h3 style={{ fontSize: '1.1rem', color: '#fff' }}>Stage 5: Production Implementation & Live Runtime Simulator</h3>
+          <div className="flex items-center gap-2" style={{ marginBottom: 6 }}>
+            <Sparkles size={18} style={{ color: 'var(--deco-indigo)' }} />
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              Stage 5 — Production Code & Live Runtime Simulator
+            </h3>
           </div>
-          <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
-            Experience your low-level design running live in memory or inspect the production-grade multi-threaded reference code.
+          <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
+            Experience your design running live in memory or inspect the multi-threaded reference implementation.
           </p>
         </div>
 
-        {/* View Toggle */}
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('simulator')}
-            className={activeTab === 'simulator' ? 'btn btn-primary' : 'btn btn-secondary'}
+            className={activeTab === 'simulator' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
             id="tab-btn-simulator"
           >
-            <Play size={15} /> Interactive Simulator
+            <Play size={14} /> Simulator
           </button>
           <button
             onClick={() => setActiveTab('code')}
-            className={activeTab === 'code' ? 'btn btn-primary' : 'btn btn-secondary'}
+            className={activeTab === 'code' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
             id="tab-btn-code"
           >
-            <Code2 size={15} /> Production Code
+            <Code2 size={14} /> Reference Code
           </button>
         </div>
       </div>
 
-      {/* Main Content Area */}
       {activeTab === 'simulator' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {renderSimulator()}
-        </div>
+        <div>{renderSimulator()}</div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Code Viewer Panel */}
-          <div style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-lg)',
-            overflow: 'hidden'
-          }}>
-            {/* Code Header Bar */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '12px 18px',
-              background: 'rgba(9, 13, 22, 0.95)',
-              borderBottom: '1px solid var(--border-subtle)',
-              flexWrap: 'wrap',
-              gap: '10px'
-            }}>
-              <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex-col gap-5">
+          {/* Code viewer */}
+          <div className="sim-panel">
+            <div className="sim-panel-header">
+              <div className="flex gap-2">
                 <button
                   onClick={() => setLang('java')}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: lang === 'java' ? '1px solid #6366f1' : '1px solid transparent',
-                    background: lang === 'java' ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255,255,255,0.04)',
-                    color: lang === 'java' ? '#a5b4fc' : 'var(--text-secondary)',
-                    fontWeight: '600',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
+                  className={lang === 'java' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
                 >
-                  ☕ Java (Thread-Safe)
+                  ☕ Java
                 </button>
                 <button
                   onClick={() => setLang('python')}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: lang === 'python' ? '1px solid #10b981' : '1px solid transparent',
-                    background: lang === 'python' ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255,255,255,0.04)',
-                    color: lang === 'python' ? '#34d399' : 'var(--text-secondary)',
-                    fontWeight: '600',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
+                  className={lang === 'python' ? 'btn btn-success btn-sm' : 'btn btn-secondary btn-sm'}
                 >
-                  🐍 Python 3
+                  🐍 Python
                 </button>
               </div>
-
               <button onClick={handleCopyCode} className="btn btn-secondary btn-sm">
-                {copied ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
-                {copied ? 'Copied!' : 'Copy Code'}
+                {copied
+                  ? <><Check size={13} style={{ color: 'var(--accent-emerald)' }} /> Copied!</>
+                  : <><Copy size={13} /> Copy Code</>}
               </button>
             </div>
-
-            {/* Syntax Display */}
-            <div style={{
-              padding: '20px',
-              background: '#090d16',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.84rem',
-              lineHeight: '1.65',
-              overflowX: 'auto',
-              maxHeight: '560px',
-              color: '#cbd5e1'
+            <div className="code-block" style={{
+              maxHeight: 560,
+              overflowY: 'auto',
+              borderRadius: 0,
+              border: 'none',
+              borderTop: '1px solid var(--border-subtle)'
             }}>
-              <pre>
-                <code>{currentCode}</code>
-              </pre>
+              <pre><code>{currentCode}</code></pre>
             </div>
           </div>
 
-          {/* SOLID Principles Compliance Audit */}
-          <div style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Award size={18} color="#10b981" />
-              <h4 style={{ fontSize: '0.95rem', color: '#fff' }}>SOLID Principles Architectural Audit</h4>
+          {/* SOLID Audit */}
+          <div className="card">
+            <div className="flex items-center gap-2" style={{ marginBottom: 14 }}>
+              <Award size={17} style={{ color: 'var(--accent-emerald)' }} />
+              <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                SOLID Principles Audit
+              </h4>
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
-              <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'rgba(9, 13, 22, 0.7)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ color: '#6ee7b7', fontWeight: '700', fontSize: '0.82rem' }}>S — Single Responsibility</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  Controllers orchestrate, models store domain invariants, strategies compute policies.
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+              {solidPrinciples.map(p => (
+                <div key={p.letter} className="card-raised">
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-emerald)', marginBottom: 4 }}>
+                    {p.letter} — {p.label}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    {p.desc}
+                  </div>
                 </div>
-              </div>
-
-              <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'rgba(9, 13, 22, 0.7)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ color: '#6ee7b7', fontWeight: '700', fontSize: '0.82rem' }}>O — Open/Closed Principle</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  New vehicle types, pricing formulas, or dispatch rules plug in without changing core classes.
-                </div>
-              </div>
-
-              <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'rgba(9, 13, 22, 0.7)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ color: '#6ee7b7', fontWeight: '700', fontSize: '0.82rem' }}>L — Liskov Substitution</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  Subclasses satisfy contracts cleanly without violating invariants or throwing UnsupportedOperationException.
-                </div>
-              </div>
-
-              <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'rgba(9, 13, 22, 0.7)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ color: '#6ee7b7', fontWeight: '700', fontSize: '0.82rem' }}>I & D — Interface Segregation & DIP</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  Narrow, client-tailored interfaces injected via constructors rather than hard concrete instantiations.
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Navigation Footer */}
-      <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-        <button onClick={onProceedPrev} className="btn btn-secondary">
-          ← Back: Design Patterns
-        </button>
+      {/* Navigation */}
+      <div>
+        <button onClick={onProceedPrev} className="btn btn-secondary">← Design Patterns</button>
       </div>
     </div>
   );

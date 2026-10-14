@@ -1516,7 +1516,7 @@ class ShowSeat:
         return True`
     },
 
-    simulatorType: 'parking-lot'
+    simulatorType: 'bookmyshow'
   },
 
   {
@@ -1634,7 +1634,7 @@ class State:
     def dispense(self, machine): pass`
     },
 
-    simulatorType: 'parking-lot'
+    simulatorType: 'vending-machine'
   }
 ];
 

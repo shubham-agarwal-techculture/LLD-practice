@@ -1,175 +1,176 @@
 import React, { useState } from 'react';
-import { X, Search, CheckCircle, ArrowRight } from 'lucide-react';
+import { X, Search, CheckCircle, ArrowRight, Trash2, Plus } from 'lucide-react';
 import { LLD_SCENARIOS } from '../data/scenarios';
 
-export default function ScenarioLibraryModal({ isOpen, onClose, onSelectScenario, currentScenarioId, solvedMap }) {
+export default function ScenarioLibraryModal({
+  isOpen,
+  onClose,
+  onSelectScenario,
+  currentScenarioId,
+  solvedMap,
+  customScenarios = [],
+  onDeleteCustomScenario,
+  onOpenGenerator
+}) {
   const [search, setSearch] = useState('');
-  const [filterDifficulty, setFilterDifficulty] = useState('ALL');
+  const [filterTab, setFilterTab] = useState('ALL');
 
   if (!isOpen) return null;
 
-  const filtered = LLD_SCENARIOS.filter(s => {
-    const matchesSearch = s.title.toLowerCase().includes(search.toLowerCase()) ||
-      s.company.toLowerCase().includes(search.toLowerCase()) ||
-      s.tags.some(t => t.toLowerCase().includes(search.toLowerCase()));
-    const matchesDiff = filterDifficulty === 'ALL' || s.difficulty.toUpperCase() === filterDifficulty;
-    return matchesSearch && matchesDiff;
+  const allScenarios = [...customScenarios, ...LLD_SCENARIOS];
+  const filtered = allScenarios.filter(s => {
+    const q = search.toLowerCase();
+    const matchesSearch = s.title.toLowerCase().includes(q) ||
+      s.company.toLowerCase().includes(q) ||
+      s.tags.some(t => t.toLowerCase().includes(q));
+    if (filterTab === 'CURATED') return matchesSearch && !s.isCustom;
+    if (filterTab === 'ON-DEMAND') return matchesSearch && s.isCustom;
+    return matchesSearch;
   });
 
+  const tabs = [
+    { id: 'ALL', label: `All (${allScenarios.length})` },
+    { id: 'CURATED', label: `Curated (${LLD_SCENARIOS.length})` },
+    { id: 'ON-DEMAND', label: `Custom (${customScenarios.length})` },
+  ];
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.75)',
-      backdropFilter: 'blur(8px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      zIndex: 1100
-    }}>
-      <div style={{
-        width: '760px',
-        maxWidth: '100%',
-        maxHeight: '85vh',
-        background: 'rgba(15, 23, 42, 0.98)',
-        border: '1px solid var(--border-medium)',
-        borderRadius: 'var(--radius-xl)',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}>
-        {/* Modal Header */}
-        <div style={{
-          padding: '20px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div
+        className="modal-box modal-box-lg"
+        style={{ maxHeight: '88vh', display: 'flex', flexDirection: 'column' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="modal-header">
           <div>
-            <h3 style={{ fontSize: '1.2rem', color: '#fff' }}>Curated LLD Scenario Library</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-              Practice any daily low-level design problem from top tech companies.
+            <div className="flex items-center gap-2">
+              <h2>Scenario Registry</h2>
+              <span className="mono-tag">{allScenarios.length} specs</span>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
+              Curated FAANG blueprints + your on-demand synthesized problems
             </p>
           </div>
-          <button onClick={onClose} className="btn btn-secondary btn-sm" style={{ padding: '6px' }}>
-            <X size={18} />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => { onClose(); onOpenGenerator(); }}
+              className="btn btn-primary btn-sm"
+            >
+              <Plus size={13} /> New Custom
+            </button>
+            <button onClick={onClose} className="btn btn-ghost btn-icon btn-sm">
+              <X size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Filters */}
         <div style={{
-          padding: '14px 24px',
+          padding: '12px 24px',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
-          gap: '12px',
+          gap: 10,
           flexWrap: 'wrap',
-          background: 'rgba(9, 13, 22, 0.5)'
+          background: 'var(--bg-raised)'
         }}>
-          <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
-            <Search size={16} color="#64748b" style={{ position: 'absolute', left: '12px', top: '10px' }} />
+          <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
+            <Search size={13} style={{
+              position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)',
+              color: 'var(--text-muted)', pointerEvents: 'none'
+            }} />
             <input
               type="text"
-              placeholder="Search by topic, company, or pattern..."
+              placeholder="Search by title, company, or pattern…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px 8px 36px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-medium)',
-                background: '#090d16',
-                color: '#fff',
-                fontSize: '0.82rem'
-              }}
+              style={{ paddingLeft: 32 }}
             />
           </div>
-
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {['ALL', 'EASY', 'MEDIUM', 'HARD'].map(diff => (
+          <div className="flex gap-1">
+            {tabs.map(tab => (
               <button
-                key={diff}
-                onClick={() => setFilterDifficulty(diff)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: filterDifficulty === diff ? '1px solid var(--accent-indigo)' : '1px solid var(--border-subtle)',
-                  background: filterDifficulty === diff ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255,255,255,0.03)',
-                  color: filterDifficulty === diff ? '#a5b4fc' : 'var(--text-secondary)',
-                  fontSize: '0.74rem',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
+                key={tab.id}
+                onClick={() => setFilterTab(tab.id)}
+                className={filterTab === tab.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
               >
-                {diff}
+                {tab.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Scenario List */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '20px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px'
-        }}>
-          {filtered.map(s => {
+        {/* Scenario list */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)', fontSize: '0.84rem' }}>
+              No scenarios found. Try a different search or create one on-demand!
+            </div>
+          ) : filtered.map(s => {
             const isCurrent = s.id === currentScenarioId;
             const isSolved = !!solvedMap?.[s.id];
+            const diffClass = s.difficulty === 'Easy' ? 'badge-easy' : s.difficulty === 'Medium' ? 'badge-medium' : 'badge-hard';
 
             return (
               <div
                 key={s.id}
-                onClick={() => {
-                  onSelectScenario(s);
-                  onClose();
-                }}
-                id={`scenario-card-${s.id}`}
                 style={{
-                  padding: '16px',
-                  borderRadius: 'var(--radius-md)',
-                  background: isCurrent ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                  border: isCurrent ? '1px solid var(--accent-indigo)' : '1px solid var(--border-subtle)',
-                  cursor: 'pointer',
+                  padding: '14px 16px',
+                  borderRadius: 8,
+                  background: isCurrent ? 'var(--surface-indigo)' : 'var(--bg-raised)',
+                  border: `1px solid ${isCurrent ? 'var(--border-indigo)' : 'var(--border-subtle)'}`,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  gap: '14px',
-                  transition: 'all 0.2s'
+                  gap: 14,
+                  transition: 'all 0.15s'
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span className={`badge ${s.difficulty === 'Easy' ? 'badge-easy' : s.difficulty === 'Medium' ? 'badge-medium' : 'badge-hard'}`}>
-                      {s.difficulty}
-                    </span>
+                <div className="flex-col gap-2" style={{ flex: 1 }}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`badge ${diffClass}`}>{s.difficulty}</span>
                     <span className="badge badge-company">{s.company}</span>
+                    {s.isCustom && (
+                      <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)' }}>
+                        custom
+                      </span>
+                    )}
                     {isSolved && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#34d399', fontWeight: '700' }}>
-                        <CheckCircle size={14} /> Solved
+                      <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)', fontWeight: 700 }}>
+                        <CheckCircle size={10} /> solved
                       </span>
                     )}
                   </div>
-
-                  <h4 style={{ fontSize: '0.98rem', color: isCurrent ? '#a5b4fc' : '#fff' }}>
-                    Day {s.dayIndex}: {s.title}
+                  <h4 style={{
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    color: isCurrent ? 'var(--deco-indigo)' : 'var(--text-primary)'
+                  }}>
+                    {s.title}
                   </h4>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
                     {s.summary}
                   </p>
                 </div>
 
-                <div style={{ flexShrink: 0 }}>
-                  <button className="btn btn-secondary btn-sm" style={{ padding: '6px 12px', fontSize: '0.76rem' }}>
-                    {isCurrent ? 'Practicing' : 'Select'} <ArrowRight size={13} />
+                <div className="flex gap-2 items-center" style={{ flexShrink: 0 }}>
+                  {s.isCustom && onDeleteCustomScenario && (
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (window.confirm(`Delete "${s.title}"?`)) onDeleteCustomScenario(s.id);
+                      }}
+                      className="btn btn-danger btn-sm btn-icon"
+                      title="Delete"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { onSelectScenario(s); onClose(); }}
+                    className={isCurrent ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm'}
+                  >
+                    {isCurrent ? 'Active' : 'Load'} <ArrowRight size={12} />
                   </button>
                 </div>
               </div>

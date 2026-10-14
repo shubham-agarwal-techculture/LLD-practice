@@ -9,17 +9,32 @@ import MilestoneCodeSim from './components/MilestoneCodeSim';
 import AIMentorDrawer from './components/AIMentorDrawer';
 import PracticeWorkspace from './components/PracticeWorkspace';
 import ScenarioLibraryModal from './components/ScenarioLibraryModal';
-import CustomScenarioModal from './components/CustomScenarioModal';
+import ScenarioGeneratorModal from './components/ScenarioGeneratorModal';
 import AISettingsModal from './components/AISettingsModal';
 import { getScenarioOfTheDay, LLD_SCENARIOS } from './data/scenarios';
 import { DEFAULT_AI_CONFIG } from './data/aiProviders';
 
 export default function App() {
+  // Custom On-Demand Scenarios
+  const [customScenarios, setCustomScenarios] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lld_custom_scenarios');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('lld_custom_scenarios', JSON.stringify(customScenarios));
+  }, [customScenarios]);
+
+  // Current Scenario Selection
   const [scenario, setScenario] = useState(() => getScenarioOfTheDay());
   const [currentStage, setCurrentStage] = useState(0); // 0 to 4
   const [isMentorOpen, setIsMentorOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
-  const [isCustomOpen, setIsCustomOpen] = useState(false);
+  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
 
   // Theme State: 'dark' | 'light'
@@ -36,7 +51,7 @@ export default function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // AI Multi-Provider Config
+  // AI Multi-Provider Config (Ollama, Gemini, OpenAI, Groq, etc.)
   const [aiConfig, setAiConfig] = useState(() => {
     try {
       const saved = localStorage.getItem('lld_ai_config');
@@ -87,9 +102,18 @@ export default function App() {
     setCurrentStage(0);
   };
 
-  const handleAddCustomScenario = (newScenario) => {
+  const handleScenarioGenerated = (newScenario) => {
+    setCustomScenarios(prev => [newScenario, ...prev]);
     setScenario(newScenario);
     setCurrentStage(0);
+  };
+
+  const handleDeleteCustomScenario = (scenarioId) => {
+    setCustomScenarios(prev => prev.filter(s => s.id !== scenarioId));
+    if (scenario.id === scenarioId) {
+      setScenario(getScenarioOfTheDay());
+      setCurrentStage(0);
+    }
   };
 
   const renderActiveStage = () => {
@@ -137,43 +161,84 @@ export default function App() {
     }
   };
 
+  // Layout View Mode: 'split' | 'guide' | 'workbench'
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('lld_view_mode') || 'split';
+  });
+
+  const handleSelectViewMode = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem('lld_view_mode', mode);
+  };
+
   return (
     <div className="app-container">
-      {/* Top Navbar with Theme Switcher & AI Provider Status */}
+      {/* Top Engineering Navbar */}
       <Navbar
         streak={streak}
         theme={theme}
         onToggleTheme={toggleTheme}
-        totalScenarios={LLD_SCENARIOS.length}
+        totalScenarios={LLD_SCENARIOS.length + customScenarios.length}
         onOpenLibrary={() => setIsLibraryOpen(true)}
-        onOpenCustom={() => setIsCustomOpen(true)}
+        onOpenGenerator={() => setIsGeneratorOpen(true)}
         onToggleMentor={() => setIsMentorOpen(!isMentorOpen)}
         onOpenAISettings={() => setIsAISettingsOpen(true)}
         isMentorOpen={isMentorOpen}
         aiConfig={aiConfig}
       />
 
-      {/* Main Content Area */}
+      {/* Main Studio Content Area */}
       <main className="main-content">
-        {/* Daily Scenario Banner & Stage Pills */}
+        {/* Architectural Problem Brief, Layout Selector & Milestone Stepper */}
         <DailyBanner
           scenario={scenario}
           currentStage={currentStage}
           onSelectStage={setCurrentStage}
           isSolved={!!solvedMap[scenario.id]}
+          viewMode={viewMode}
+          onSelectViewMode={handleSelectViewMode}
         />
 
-        {/* Active Stage Guided Milestone */}
-        {renderActiveStage()}
+        {/* Studio Workspace Layout */}
+        {viewMode === 'split' && (
+          <div className="studio-layout">
+            <div className="studio-guide-pane">
+              {renderActiveStage()}
+            </div>
+            <div className="studio-workbench-pane">
+              <PracticeWorkspace
+                scenario={scenario}
+                currentStage={currentStage}
+                aiConfig={aiConfig}
+                onOpenAISettings={() => setIsAISettingsOpen(true)}
+                onCompleteScenario={handleCompleteScenario}
+                isSolved={!!solvedMap[scenario.id]}
+              />
+            </div>
+          </div>
+        )}
 
-        {/* User Practice Workspace & Solution Submission Rubric */}
-        <PracticeWorkspace
-          scenario={scenario}
-          onCompleteScenario={handleCompleteScenario}
-        />
+        {viewMode === 'guide' && (
+          <div className="studio-guide-pane">
+            {renderActiveStage()}
+          </div>
+        )}
+
+        {viewMode === 'workbench' && (
+          <div className="flex-col gap-4">
+            <PracticeWorkspace
+              scenario={scenario}
+              currentStage={currentStage}
+              aiConfig={aiConfig}
+              onOpenAISettings={() => setIsAISettingsOpen(true)}
+              onCompleteScenario={handleCompleteScenario}
+              isSolved={!!solvedMap[scenario.id]}
+            />
+          </div>
+        )}
       </main>
 
-      {/* Slide-out AI Mentor Drawer with Multi-Provider Support */}
+      {/* Slide-out AI Mentor Assistant */}
       <AIMentorDrawer
         isOpen={isMentorOpen}
         onClose={() => setIsMentorOpen(false)}
@@ -183,7 +248,7 @@ export default function App() {
         onOpenSettings={() => setIsAISettingsOpen(true)}
       />
 
-      {/* AI Multi-Provider Configuration Modal (Ollama, Gemini, OpenAI, etc.) */}
+      {/* AI Multi-Provider Configuration Modal (Ollama, Gemini, OpenAI, Groq) */}
       <AISettingsModal
         isOpen={isAISettingsOpen}
         onClose={() => setIsAISettingsOpen(false)}
@@ -191,40 +256,30 @@ export default function App() {
         onSaveConfig={setAiConfig}
       />
 
-      {/* Scenario Library Modal */}
+      {/* On-Demand Scenario Architect Modal */}
+      <ScenarioGeneratorModal
+        isOpen={isGeneratorOpen}
+        onClose={() => setIsGeneratorOpen(false)}
+        aiConfig={aiConfig}
+        onScenarioGenerated={handleScenarioGenerated}
+      />
+
+      {/* Scenario Registry / Library Modal */}
       <ScenarioLibraryModal
         isOpen={isLibraryOpen}
         onClose={() => setIsLibraryOpen(false)}
         onSelectScenario={handleSelectScenario}
         currentScenarioId={scenario.id}
         solvedMap={solvedMap}
+        customScenarios={customScenarios}
+        onDeleteCustomScenario={handleDeleteCustomScenario}
+        onOpenGenerator={() => setIsGeneratorOpen(true)}
       />
 
-      {/* Custom Scenario Generator Modal */}
-      <CustomScenarioModal
-        isOpen={isCustomOpen}
-        onClose={() => setIsCustomOpen(false)}
-        onAddCustomScenario={handleAddCustomScenario}
-      />
-
-      {/* Footer */}
-      <footer style={{
-        marginTop: 'auto',
-        borderTop: '1px solid var(--border-subtle)',
-        background: 'var(--bg-glass)',
-        padding: '24px',
-        textAlign: 'center',
-        fontSize: '0.8rem',
-        color: 'var(--text-muted)'
-      }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div>
-            <strong>LLD Craft</strong> — Daily Low-Level Design Practice & Socratic Mentoring Platform.
-          </div>
-          <div>
-            Supports <strong>Ollama (Local)</strong>, Google Gemini, OpenAI, Groq, DeepSeek, and offline Socratic tutoring in Dark & Light modes.
-          </div>
-        </div>
+      {/* Technical Footer */}
+      <footer className="app-footer">
+        <span>LLD STUDIO · DELIBERATE ARCHITECTURAL PRACTICE</span>
+        <span>OLLAMA · GEMINI · GROQ · OPENAI · OFFLINE</span>
       </footer>
     </div>
   );

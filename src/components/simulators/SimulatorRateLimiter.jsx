@@ -60,17 +60,17 @@ export default function SimulatorRateLimiter() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
-        border: '1px solid var(--border-glow)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '20px',
-        boxShadow: 'var(--shadow-glow)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="pulse-indicator"></span>
-              <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Token Bucket Rate Limiter Runtime</h3>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Token Bucket Rate Limiter Runtime</h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
               Simulates thread-safe token consumption, continuous background refill, and HTTP 429 backoff headers.
@@ -91,7 +91,7 @@ export default function SimulatorRateLimiter() {
       <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px' }}>
         {/* Token Bucket Visual Gauge */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '20px',
@@ -164,7 +164,7 @@ export default function SimulatorRateLimiter() {
 
         {/* HTTP Headers & Log Stream */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '20px',
@@ -172,12 +172,12 @@ export default function SimulatorRateLimiter() {
           flexDirection: 'column',
           gap: '14px'
         }}>
-          <h4 style={{ fontSize: '0.9rem', color: '#a5b4fc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h4 style={{ fontSize: '0.9rem', color: 'var(--accent-indigo)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Zap size={16} /> HTTP Client Interceptor Stream
           </h4>
 
           <div style={{
-            background: 'rgba(9, 13, 22, 0.95)',
+            background: 'var(--bg-code)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
             padding: '12px',

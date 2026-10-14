@@ -118,17 +118,17 @@ export default function SimulatorSplitwise() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
-        border: '1px solid var(--border-glow)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '20px',
-        boxShadow: 'var(--shadow-glow)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="pulse-indicator"></span>
-              <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Splitwise Graph & Balance Settlement Engine</h3>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Splitwise Graph & Balance Settlement Engine</h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
               Live execution of Strategy Pattern expense splits and greedy Min-Cash-Flow graph debt simplification.
@@ -178,12 +178,12 @@ export default function SimulatorSplitwise() {
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 360px) 1fr', gap: '20px' }}>
         {/* Add Expense Form */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '18px'
         }}>
-          <h4 style={{ fontSize: '0.95rem', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: '#a5b4fc' }}>
+          <h4 style={{ fontSize: '0.95rem', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-indigo)' }}>
             <PlusCircle size={16} /> Record New Split Expense
           </h4>
 
@@ -202,8 +202,8 @@ export default function SimulatorSplitwise() {
                   padding: '8px 12px',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-medium)',
-                  background: 'rgba(10, 15, 26, 0.8)',
-                  color: '#fff',
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   fontSize: '0.85rem'
                 }}
               />
@@ -223,8 +223,8 @@ export default function SimulatorSplitwise() {
                     padding: '8px 12px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--border-medium)',
-                    background: 'rgba(10, 15, 26, 0.8)',
-                    color: '#fff',
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-primary)',
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.88rem'
                   }}
@@ -243,8 +243,8 @@ export default function SimulatorSplitwise() {
                     padding: '8px 12px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--border-medium)',
-                    background: 'rgba(10, 15, 26, 0.8)',
-                    color: '#fff',
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-primary)',
                     fontSize: '0.85rem'
                   }}
                 >
@@ -281,7 +281,7 @@ export default function SimulatorSplitwise() {
 
         {/* Simplified Settlement Graph (Min Cash Flow) */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '18px',
@@ -290,7 +290,7 @@ export default function SimulatorSplitwise() {
           gap: '14px'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4 style={{ fontSize: '0.95rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckCircle2 size={16} color="#10b981" /> Simplified Debt Settlement (Min Cash Flow)
             </h4>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

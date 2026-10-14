@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Flame, Clock, BookOpen, Wand2, Bot, Sun, Moon, Settings2, Cpu } from 'lucide-react';
+import { Terminal, Flame, Clock, BookOpen, Plus, Bot, Sun, Moon, Cpu } from 'lucide-react';
 import { getTimeUntilNextScenario } from '../data/scenarios';
 import { AI_PROVIDERS } from '../data/aiProviders';
 
@@ -8,7 +8,7 @@ export default function Navbar({
   theme = 'dark',
   onToggleTheme,
   onOpenLibrary,
-  onOpenCustom,
+  onOpenGenerator,
   onToggleMentor,
   onOpenAISettings,
   isMentorOpen,
@@ -18,136 +18,55 @@ export default function Navbar({
   const [timeLeft, setTimeLeft] = useState(getTimeUntilNextScenario());
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(getTimeUntilNextScenario());
-    }, 1000);
+    const timer = setInterval(() => setTimeLeft(getTimeUntilNextScenario()), 1000);
     return () => clearInterval(timer);
   }, []);
 
   const activeProvider = AI_PROVIDERS.find(p => p.id === aiConfig?.providerId) || AI_PROVIDERS[0];
+  const providerLabel = activeProvider.id === 'ollama'
+    ? `ollama/${aiConfig?.model || 'llama3'}`
+    : activeProvider.name.split(' ')[0].toLowerCase();
 
   return (
-    <header style={{
-      background: 'var(--bg-glass)',
-      backdropFilter: 'blur(16px)',
-      borderBottom: '1px solid var(--border-subtle)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      transition: 'background-color 0.25s, border-color 0.25s'
-    }}>
-      <div style={{
-        maxWidth: '1440px',
-        margin: '0 auto',
-        padding: '12px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
-        {/* Brand / Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)'
-          }}>
-            <Layers size={22} color="#fff" />
-          </div>
+    <header className="navbar">
+      <div className="navbar-inner">
 
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-                LLD<span style={{ color: '#818cf8' }}>Craft</span>
-              </h1>
-              <span className="badge badge-primary" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
-                Daily Edition
-              </span>
-            </div>
-            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '-2px' }}>
-              Interactive Low-Level Design System & Socratic Guide
-            </p>
+        {/* Brand */}
+        <div className="navbar-brand">
+          <div className="brand-icon">
+            <Terminal size={15} color="#fff" />
           </div>
+          <span className="brand-name">
+            LLD<span>STUDIO</span>
+          </span>
+          <span className="mono-tag" style={{ fontSize: '0.62rem' }}>v2.4</span>
         </div>
 
-        {/* Center / Daily Countdown & Streak */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          {/* Streak Counter */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '5px 12px',
-            borderRadius: '9999px',
-            background: 'rgba(245, 158, 11, 0.12)',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            color: '#f59e0b',
-            fontSize: '0.8rem',
-            fontWeight: '700'
-          }}>
-            <Flame size={15} color="#f59e0b" />
-            <span>{streak} Day Streak</span>
-          </div>
+        {/* Center Telemetry */}
+        <div className="navbar-meta">
+          <span className="mono-tag" style={{ color: 'var(--accent-amber)', borderColor: 'var(--border-amber)' }}>
+            <Flame size={11} />
+            {streak}d streak
+          </span>
 
-          {/* Daily Timer */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.78rem',
-            color: 'var(--text-secondary)',
-            background: 'var(--bg-tertiary)',
-            padding: '5px 12px',
-            borderRadius: '9999px',
-            border: '1px solid var(--border-subtle)'
-          }}>
-            <Clock size={14} color="#818cf8" />
-            <span>Next Scenario in:</span>
-            <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+          <span className="mono-tag">
+            <Clock size={11} style={{ color: 'var(--accent-indigo)' }} />
+            next:
+            <strong className="text-primary">
               {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}
             </strong>
-          </div>
+          </span>
         </div>
 
-        {/* Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Theme Toggle Button (Dark / Light) */}
+        {/* Actions */}
+        <div className="navbar-actions">
           <button
-            onClick={onToggleTheme}
-            className="btn btn-secondary btn-sm"
-            id="nav-btn-theme"
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-            style={{ padding: '6px 10px', fontSize: '0.78rem' }}
+            onClick={onOpenGenerator}
+            className="btn btn-primary btn-sm"
+            id="nav-btn-generate-scenario"
           >
-            {theme === 'dark' ? (
-              <>
-                <Sun size={15} color="#f59e0b" />
-                <span style={{ fontSize: '0.75rem' }}>Light</span>
-              </>
-            ) : (
-              <>
-                <Moon size={15} color="#818cf8" />
-                <span style={{ fontSize: '0.75rem' }}>Dark</span>
-              </>
-            )}
-          </button>
-
-          {/* AI Settings Button */}
-          <button
-            onClick={onOpenAISettings}
-            className="btn btn-secondary btn-sm"
-            id="nav-btn-ai-settings"
-            title="Configure AI Providers (Ollama, Gemini, OpenAI, etc.)"
-            style={{ padding: '6px 10px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px' }}
-          >
-            <Cpu size={14} color="#10b981" />
-            <span>{activeProvider.id === 'ollama' ? '🦙 Ollama' : activeProvider.name.split(' ')[0]}</span>
+            <Plus size={13} />
+            New Scenario
           </button>
 
           <button
@@ -155,37 +74,38 @@ export default function Navbar({
             className="btn btn-secondary btn-sm"
             id="nav-btn-library"
           >
-            <BookOpen size={14} /> Library ({totalScenarios})
+            <BookOpen size={13} />
+            Library ({totalScenarios})
           </button>
 
           <button
-            onClick={onOpenCustom}
+            onClick={onOpenAISettings}
             className="btn btn-secondary btn-sm"
-            id="nav-btn-custom"
+            id="nav-btn-ai-settings"
+            title="Configure AI Engine"
           >
-            <Wand2 size={14} /> Custom
+            <Cpu size={13} style={{ color: 'var(--accent-emerald)' }} />
+            <span className="font-mono" style={{ fontSize: '0.72rem' }}>{providerLabel}</span>
+          </button>
+
+          <button
+            onClick={onToggleTheme}
+            className="btn btn-ghost btn-icon btn-sm"
+            id="nav-btn-theme"
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          >
+            {theme === 'dark'
+              ? <Sun size={15} style={{ color: 'var(--accent-amber)' }} />
+              : <Moon size={15} style={{ color: 'var(--deco-indigo)' }} />}
           </button>
 
           <button
             onClick={onToggleMentor}
-            className="btn btn-primary btn-sm"
+            className={isMentorOpen ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
             id="nav-btn-mentor"
-            style={{ position: 'relative' }}
           >
-            <Bot size={15} />
-            <span>AI Mentor</span>
-            {!isMentorOpen && (
-              <span style={{
-                position: 'absolute',
-                top: '-3px',
-                right: '-3px',
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: '#10b981',
-                boxShadow: '0 0 6px #10b981'
-              }} />
-            )}
+            <Bot size={14} />
+            Copilot
           </button>
         </div>
       </div>

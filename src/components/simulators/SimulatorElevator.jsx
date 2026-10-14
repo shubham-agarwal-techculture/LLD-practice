@@ -111,17 +111,17 @@ export default function SimulatorElevator() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Elevator Simulator Header */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
-        border: '1px solid var(--border-glow)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '20px',
-        boxShadow: 'var(--shadow-glow)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="pulse-indicator"></span>
-              <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Elevator State Machine & LOOK Dispatch Simulator</h3>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Elevator State Machine & LOOK Dispatch Simulator</h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
               Simulates elevator car state transitions: IDLE, MOVING_UP, MOVING_DOWN, and DOOR_OPEN.
@@ -145,7 +145,7 @@ export default function SimulatorElevator() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px' }}>
         {/* Elevator Shaft Visualization */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '20px'
@@ -234,12 +234,12 @@ export default function SimulatorElevator() {
         {/* In-Cabin Panel & Telemetry */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{
-            background: 'rgba(15, 23, 42, 0.7)',
+            background: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px'
           }}>
-            <h4 style={{ fontSize: '0.9rem', marginBottom: '12px', color: '#a5b4fc' }}>
+            <h4 style={{ fontSize: '0.9rem', marginBottom: '12px', color: 'var(--accent-indigo)' }}>
               🎛️ In-Cabin Destination Buttons
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>

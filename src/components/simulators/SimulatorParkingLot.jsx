@@ -123,17 +123,17 @@ export default function SimulatorParkingLot() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Simulation Header with Real-Time Display Board */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
-        border: '1px solid var(--border-glow)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '20px',
-        boxShadow: 'var(--shadow-glow)'
+        boxShadow: 'var(--shadow-sm)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="pulse-indicator"></span>
-              <h3 style={{ fontSize: '1.15rem', color: '#fff' }}>Live Smart Parking Facility Simulator</h3>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Live Smart Parking Facility Simulator</h3>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
               Interactive runtime simulation of your LLD Strategy & Concurrency design. Test entry spot allocation and checkout billing!
@@ -148,7 +148,7 @@ export default function SimulatorParkingLot() {
         {/* Real-Time Display Board (Observer Pattern) */}
         <div style={{
           marginTop: '16px',
-          background: 'rgba(9, 13, 22, 0.9)',
+          background: 'var(--bg-code)',
           border: '1px solid rgba(16, 185, 129, 0.3)',
           borderRadius: 'var(--radius-md)',
           padding: '12px 16px',
@@ -204,12 +204,12 @@ export default function SimulatorParkingLot() {
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 320px) 1fr', gap: '20px' }}>
         {/* Entry Gate Controller */}
         <div style={{
-          background: 'rgba(15, 23, 42, 0.7)',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
           padding: '18px'
         }}>
-          <h4 style={{ fontSize: '0.95rem', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: '#a5b4fc' }}>
+          <h4 style={{ fontSize: '0.95rem', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-indigo)' }}>
             <Sparkles size={16} /> Entry Gate Controller
           </h4>
 
@@ -343,13 +343,13 @@ export default function SimulatorParkingLot() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Floor 1 */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.7)',
+            background: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontWeight: '700', fontSize: '0.88rem', color: '#cbd5e1' }}>
+              <span style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
                 LEVEL 1 (GROUND FLOOR)
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -404,13 +404,13 @@ export default function SimulatorParkingLot() {
 
           {/* Floor 2 */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.7)',
+            background: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-lg)',
             padding: '16px'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontWeight: '700', fontSize: '0.88rem', color: '#cbd5e1' }}>
+              <span style={{ fontWeight: '700', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
                 LEVEL 2 (UPPER DECK)
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -467,13 +467,13 @@ export default function SimulatorParkingLot() {
 
       {/* Active Tickets & Exit Gate Checkout Table */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.7)',
+        background: 'var(--bg-surface)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '18px'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-          <h4 style={{ fontSize: '0.95rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CreditCard size={16} color="#6366f1" /> Active Tickets at Exit Gate ({tickets.length} Parked)
           </h4>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
