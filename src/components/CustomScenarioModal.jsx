@@ -17,6 +17,8 @@ export default function CustomScenarioModal({ isOpen, onClose, onAddCustomScenar
     const newScenario = {
       id: customId,
       dayIndex: 99,
+      isCustom: true,
+      sourceMetadata: { type: 'manual', label: 'Manually added' },
       title: title.trim(),
       difficulty,
       company,

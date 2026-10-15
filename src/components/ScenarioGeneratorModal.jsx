@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Wand2, Terminal, Cpu, Layers, ArrowRight, ShieldCheck, Check } from 'lucide-react';
+import { X, Sparkles, Wand2, Terminal, Cpu, Check, Search, ExternalLink, Link2, Dice5 } from 'lucide-react';
 import { generateScenarioOnDemand, AI_PROVIDERS } from '../data/aiProviders';
+import { fetchScenarioSource, searchOnlineScenarios } from '../data/scenarioSources';
 
 const DOMAIN_PRESETS = [
   { id: 'Fintech', label: '💳 Fintech & Ledgers', example: 'Double-entry digital wallet with idempotency and audit logs' },
@@ -19,12 +20,28 @@ const FOCUS_PRESETS = [
   'Memory-Bounded Cache & Eviction'
 ];
 
-export default function ScenarioGeneratorModal({ isOpen, onClose, aiConfig, onScenarioGenerated }) {
+const SURPRISE_PROMPTS = [
+  { prompt: 'Design a concert ticket booking platform with seat holds, concurrent checkout, and payment expiry', domain: 'E-Commerce' },
+  { prompt: 'Design a smart elevator control system that schedules requests across multiple elevators', domain: 'Logistics' },
+  { prompt: 'Design a multi-channel notification service with retries, templates, and delivery preferences', domain: 'Messaging' },
+  { prompt: 'Design a digital wallet with double-entry ledger, transfers, and idempotent payments', domain: 'Fintech' },
+  { prompt: 'Design a board game engine with turn validation, undo, and game state transitions', domain: 'Gaming' },
+  { prompt: 'Design an API rate limiter with per-user quotas and pluggable algorithms', domain: 'Security' }
+];
+
+export default function ScenarioGeneratorModal({ isOpen, onClose, aiConfig, onScenarioGenerated, onOpenManual }) {
   const [prompt, setPrompt] = useState('');
   const [domain, setDomain] = useState('Logistics');
   const [focus, setFocus] = useState('Concurrency & Fine-Grained Locking');
   const [difficulty, setDifficulty] = useState('Medium');
   const [language, setLanguage] = useState('Java');
+  const [sourceMode, setSourceMode] = useState('generate');
+  const [onlineQuery, setOnlineQuery] = useState('');
+  const [sourceUrl, setSourceUrl] = useState('');
+  const [onlineResults, setOnlineResults] = useState([]);
+  const [sourceErrors, setSourceErrors] = useState([]);
+  const [sourceError, setSourceError] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [genStep, setGenStep] = useState('');
 
@@ -41,28 +58,94 @@ export default function ScenarioGeneratorModal({ isOpen, onClose, aiConfig, onSc
     e.preventDefault();
     if (!prompt.trim() || isGenerating) return;
 
+    await createScenario(prompt.trim(), domain);
+  };
+
+  const createScenario = async (scenarioPrompt, scenarioDomain, sourceMetadata) => {
+    if (isGenerating) return;
     setIsGenerating(true);
     setGenStep(`Querying ${activeProvider.name} for architectural specification...`);
 
     try {
       const generated = await generateScenarioOnDemand({
         config: aiConfig,
-        prompt: prompt.trim(),
-        domain,
+        prompt: scenarioPrompt,
+        domain: scenarioDomain,
         difficulty,
         focus,
         language
       });
 
-      onScenarioGenerated(generated);
+      onScenarioGenerated({
+        ...generated,
+        ...(sourceMetadata?.title ? { title: sourceMetadata.title } : {}),
+        ...(sourceMetadata ? { sourceMetadata } : {})
+      });
       onClose();
     } catch (err) {
       console.error('Generation error:', err);
-      alert(`Generation failed: ${err.message}`);
+      setSourceError(`Generation failed: ${err.message}`);
     } finally {
       setIsGenerating(false);
       setGenStep('');
     }
+  };
+
+  const handleSurpriseMe = () => {
+    const randomIndex = window.crypto.getRandomValues(new Uint32Array(1))[0] % SURPRISE_PROMPTS.length;
+    const pick = SURPRISE_PROMPTS[randomIndex];
+    setDomain(pick.domain);
+    setPrompt(pick.prompt);
+    void createScenario(pick.prompt, pick.domain, { type: 'generated', label: 'Surprise me' });
+  };
+
+  const handleSearchOnline = async (event) => {
+    event.preventDefault();
+    if (isSearching) return;
+    setIsSearching(true);
+    setSourceError('');
+    setSourceErrors([]);
+    setOnlineResults([]);
+    try {
+      const { results, errors } = await searchOnlineScenarios(onlineQuery);
+      setOnlineResults(results);
+      setSourceErrors(errors);
+      if (results.length === 0) setSourceError('No matching public scenarios were found. Try another topic.');
+    } catch (error) {
+      setSourceError(error.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleImportUrl = async (event) => {
+    event.preventDefault();
+    if (isSearching) return;
+    setIsSearching(true);
+    setSourceError('');
+    try {
+      const result = await fetchScenarioSource(sourceUrl);
+      setIsSearching(false);
+      await createScenario(result.prompt, 'Internet import', {
+        type: 'internet',
+        label: result.source,
+        url: result.url,
+        title: result.title
+      });
+    } catch (error) {
+      setSourceError(`Could not import this URL: ${error.message}`);
+      setIsSearching(false);
+    }
+  };
+
+  const handleCreateFromResult = async (result) => {
+    setSourceError('');
+    await createScenario(result.prompt, 'Internet discovery', {
+      type: 'internet',
+      label: result.source,
+      url: result.url,
+      title: result.title
+    });
   };
 
   return (
@@ -141,14 +224,39 @@ export default function ScenarioGeneratorModal({ isOpen, onClose, aiConfig, onSc
           </button>
         </div>
 
+        <div style={{
+          padding: '10px 22px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+          borderBottom: '1px solid var(--border-subtle)'
+        }}>
+          <button type="button" onClick={() => { setSourceMode('generate'); setSourceError(''); }} className={sourceMode === 'generate' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}>
+            <Wand2 size={13} /> Generate
+          </button>
+          <button type="button" onClick={() => { setSourceMode('internet'); setSourceError(''); }} className={sourceMode === 'internet' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}>
+            <Search size={13} /> Find online
+          </button>
+          <button type="button" onClick={handleSurpriseMe} disabled={isGenerating} className="btn btn-secondary btn-sm">
+            <Dice5 size={13} /> Surprise me
+          </button>
+          <button type="button" onClick={() => { onClose(); onOpenManual?.(); }} className="btn btn-secondary btn-sm">
+            <Link2 size={13} /> Add manually
+          </button>
+        </div>
+
         {/* Generator Form */}
-        <form onSubmit={handleGenerate} style={{
+        {sourceMode === 'generate' ? <form onSubmit={handleGenerate} style={{
           padding: '20px 22px',
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px'
         }}>
+          {sourceError && (
+            <div role="alert" style={{ color: '#fca5a5', fontSize: '0.78rem', lineHeight: 1.5 }}>{sourceError}</div>
+          )}
           {/* Prompt Specification */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -354,7 +462,78 @@ export default function ScenarioGeneratorModal({ isOpen, onClose, aiConfig, onSc
               <span>{isGenerating ? 'Synthesizing...' : 'Generate Scenario'}</span>
             </button>
           </div>
-        </form>
+        </form> : (
+          <div style={{ padding: '20px 22px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <h4 style={{ color: 'var(--text-primary)', fontSize: '0.92rem', marginBottom: 4 }}>Discover a public source</h4>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.76rem', lineHeight: 1.5 }}>
+                Search GitHub, Stack Overflow, and Wikipedia, then use a result as context for a complete practice scenario.
+              </p>
+            </div>
+            <form onSubmit={handleSearchOnline} style={{ display: 'flex', gap: 8 }}>
+              <input
+                value={onlineQuery}
+                onChange={event => setOnlineQuery(event.target.value)}
+                placeholder="e.g. parking system, ride sharing, rate limiter"
+                disabled={isSearching || isGenerating}
+                required
+                style={{ flex: 1, minWidth: 0 }}
+              />
+              <button type="submit" className="btn btn-primary btn-sm" disabled={isSearching || isGenerating}>
+                <Search size={13} /> {isSearching ? 'Searching...' : 'Search'}
+              </button>
+            </form>
+            <form onSubmit={handleImportUrl} style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="url"
+                value={sourceUrl}
+                onChange={event => setSourceUrl(event.target.value)}
+                placeholder="Or paste a public URL (GitHub repositories supported)"
+                disabled={isSearching || isGenerating}
+                required
+                style={{ flex: 1, minWidth: 0 }}
+              />
+              <button type="submit" className="btn btn-secondary btn-sm" disabled={isSearching || isGenerating}>
+                <Link2 size={13} /> Import URL
+              </button>
+            </form>
+            {sourceError && (
+              <div role="alert" style={{ color: '#fca5a5', fontSize: '0.78rem', lineHeight: 1.5 }}>{sourceError}</div>
+            )}
+            {sourceErrors.length > 0 && (
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                Some sources could not be searched: {sourceErrors.join(' · ')}
+              </div>
+            )}
+            {onlineResults.map((result, index) => (
+              <article key={`${result.url}-${index}`} style={{
+                padding: 12,
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-tertiary)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 12
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ color: 'var(--accent-indigo)', fontSize: '0.68rem', marginBottom: 3 }}>{result.source}</div>
+                  <h4 style={{ color: 'var(--text-primary)', fontSize: '0.82rem', marginBottom: 3 }}>{result.title}</h4>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', lineHeight: 1.4 }}>{result.description}</p>
+                  <a href={result.url} target="_blank" rel="noreferrer" style={{ fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 5 }}>
+                    View source <ExternalLink size={10} />
+                  </a>
+                </div>
+                <button type="button" onClick={() => handleCreateFromResult(result)} disabled={isGenerating} className="btn btn-primary btn-sm" style={{ flexShrink: 0 }}>
+                  <Wand2 size={12} /> Use
+                </button>
+              </article>
+            ))}
+            {isGenerating && (
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>{genStep || 'Building scenario...'}</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

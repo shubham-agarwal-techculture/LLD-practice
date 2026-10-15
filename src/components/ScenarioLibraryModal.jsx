@@ -132,7 +132,7 @@ export default function ScenarioLibraryModal({
                     <span className="badge badge-company">{s.company}</span>
                     {s.isCustom && (
                       <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)' }}>
-                        custom
+                        {s.sourceMetadata?.label || 'custom'}
                       </span>
                     )}
                     {isSolved && (

@@ -10,6 +10,7 @@ import AIMentorDrawer from './components/AIMentorDrawer';
 import PracticeWorkspace from './components/PracticeWorkspace';
 import ScenarioLibraryModal from './components/ScenarioLibraryModal';
 import ScenarioGeneratorModal from './components/ScenarioGeneratorModal';
+import CustomScenarioModal from './components/CustomScenarioModal';
 import AISettingsModal from './components/AISettingsModal';
 import { getScenarioOfTheDay, LLD_SCENARIOS } from './data/scenarios';
 import { DEFAULT_AI_CONFIG } from './data/aiProviders';
@@ -35,6 +36,7 @@ export default function App() {
   const [isMentorOpen, setIsMentorOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [isManualScenarioOpen, setIsManualScenarioOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
 
   // Theme State: 'dark' | 'light'
@@ -262,6 +264,13 @@ export default function App() {
         onClose={() => setIsGeneratorOpen(false)}
         aiConfig={aiConfig}
         onScenarioGenerated={handleScenarioGenerated}
+        onOpenManual={() => setIsManualScenarioOpen(true)}
+      />
+
+      <CustomScenarioModal
+        isOpen={isManualScenarioOpen}
+        onClose={() => setIsManualScenarioOpen(false)}
+        onAddCustomScenario={handleScenarioGenerated}
       />
 
       {/* Scenario Registry / Library Modal */}

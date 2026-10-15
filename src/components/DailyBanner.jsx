@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Briefcase, Clock, Check, Terminal, ChevronDown, ChevronUp, Columns, BookOpen, PenTool } from 'lucide-react';
+import { Calendar, Briefcase, Clock, Check, Terminal, ChevronDown, ChevronUp, Columns, BookOpen, PenTool, ExternalLink } from 'lucide-react';
 
 export default function DailyBanner({
   scenario,
@@ -48,9 +48,22 @@ export default function DailyBanner({
             </span>
 
             {scenario.isCustom ? (
-              <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)' }}>
-                ✦ ON-DEMAND
-              </span>
+              <>
+                <span className="mono-tag" style={{ color: 'var(--accent-emerald)', borderColor: 'var(--border-emerald)' }}>
+                  ✦ {scenario.sourceMetadata?.label || 'ON-DEMAND'}
+                </span>
+                {scenario.sourceMetadata?.url && (
+                  <a
+                    className="mono-tag"
+                    href={scenario.sourceMetadata.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                  >
+                    <ExternalLink size={10} /> Source
+                  </a>
+                )}
+              </>
             ) : (
               <span className="mono-tag">
                 <Calendar size={10} />
